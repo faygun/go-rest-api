@@ -1,0 +1,15 @@
+
+
+
+
+
+
+                            go (workspace)
+                                -bin
+                                -src
+                                    -github.com
+                                        <your_user_name>
+                                            -your_project_1
+                                                # your project files
+                                            -your_project_2
+                                                # your project files
