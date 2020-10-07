@@ -6,21 +6,21 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/faygun/goRestApi/helper"
-	"github.com/faygun/goRestApi/models"
+	"github.com/faygun/go-rest-api/helper"
+	"github.com/faygun/go-rest-api/models"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+//Connection mongoDB with helper class
+var collection = helper.ConnectDB()
 
 func getBooks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// we created Book array
 	var books []models.Book
-
-	//Connection mongoDB with helper class
-	collection := helper.ConnectDB()
 
 	// bson.M{},  we passed empty filter. So we want to get all data.
 	cur, err := collection.Find(context.TODO(), bson.M{})
@@ -67,8 +67,6 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 	// string to primitive.ObjectID
 	id, _ := primitive.ObjectIDFromHex(params["id"])
 
-	collection := helper.ConnectDB()
-
 	// We create filter. If it is unnecessary to sort data for you, you can use bson.M{}
 	filter := bson.M{"_id": id}
 	err := collection.FindOne(context.TODO(), filter).Decode(&book)
@@ -88,9 +86,6 @@ func createBook(w http.ResponseWriter, r *http.Request) {
 
 	// we decode our body request params
 	_ = json.NewDecoder(r.Body).Decode(&book)
-
-	// connect db
-	collection := helper.ConnectDB()
 
 	// insert our book model.
 	result, err := collection.InsertOne(context.TODO(), book)
@@ -112,8 +107,6 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 	id, _ := primitive.ObjectIDFromHex(params["id"])
 
 	var book models.Book
-
-	collection := helper.ConnectDB()
 
 	// Create filter
 	filter := bson.M{"_id": id}
@@ -155,8 +148,6 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 	// string to primitve.ObjectID
 	id, err := primitive.ObjectIDFromHex(params["id"])
 
-	collection := helper.ConnectDB()
-
 	// prepare filter.
 	filter := bson.M{"_id": id}
 
@@ -182,6 +173,7 @@ func main() {
 	r.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
 	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(":8000", r))
+	config := helper.GetConfiguration()
+	log.Fatal(http.ListenAndServe(config.Port, r))
 
 }

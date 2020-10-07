@@ -1,5 +1,0 @@
-{
-    "Port": 8000,
-    "Static_Variable": "static",
-    "Connection_String":"mongodb+srv://afa:252525@cluster0-czdkh.mongodb.net/test?retryWrites=true&w=majority"
-}
